@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer } from "react"
 import PropTypes from "prop-types"
+
 import { getBooks } from "../ui/apiCalls"
 
 const BookCont = createContext()
@@ -7,7 +8,7 @@ const BookCont = createContext()
 const initialState = {
   query: "",
   books: [],
-  loading: false,
+  status: "active",
 }
 
 const reducer = (state, action) => {
@@ -15,34 +16,37 @@ const reducer = (state, action) => {
     case "set_query":
       return { ...state, query: action.payload }
     case "set_books":
-      return { ...state, books: action.payload }
+      return { ...state, books: action.payload, status: "dataLoaded" }
+    case "set_status":
+      return { ...state, status: "loading" }
+
     default:
       return state
   }
 }
 
 const BookContextProvider = ({ children }) => {
-  const [{ query, books, loading }, dispatch] = useReducer(
-    reducer,
-    initialState
-  )
+  const [{ query, books, status }, dispatch] = useReducer(reducer, initialState)
 
   //Methods
   const handleSearch = (e) => {
     e.preventDefault()
 
     //API call to search for book
-    // console.log("Searching for book")
-    getBooks("harry potter").then((data) => {
+
+    dispatch({ type: "set_status" })
+
+    getBooks(query).then((data) => {
       const filteredBook = {
         totalItems: data.totalItems,
-        books: data.items.map((item) => {
+        itemBook: data.items.map((item) => {
           return {
             id: item.id,
             title: item.volumeInfo.title,
             authors: item.volumeInfo.authors,
             description: item.volumeInfo.description,
             image: item.volumeInfo.imageLinks.thumbnail,
+            infoLink: item.volumeInfo.infoLink,
           }
         }),
       }
@@ -54,7 +58,7 @@ const BookContextProvider = ({ children }) => {
     dispatch({ type: "set_query", payload: "" })
   }
 
-  const value = { query, books, loading, dispatch, onSearch: handleSearch }
+  const value = { query, books, status, dispatch, onSearch: handleSearch }
 
   return <BookCont.Provider value={value}>{children}</BookCont.Provider>
 }

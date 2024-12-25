@@ -4,14 +4,15 @@ import AppLayout from "./ui/AppLayout"
 import HeroSection from "./features/Hero/HeroSection"
 import Book from "./features/Book/Book"
 import BookItems from "./features/Book/BookItems"
+import AboutMe from "./features/About/AboutMe"
 
 const router = createBrowserRouter([
   {
-    path: "/", // matches the root URL
+    path: "/",
     element: <AppLayout />,
     children: [
       {
-        index: true, // matches the root URL exactly
+        index: true,
         element: <HeroSection />,
       },
       {
@@ -25,7 +26,7 @@ const router = createBrowserRouter([
 
       {
         path: "/about",
-        element: <div>About</div>,
+        element: <AboutMe />,
       },
     ],
   },
